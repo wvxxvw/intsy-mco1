@@ -6,85 +6,140 @@ public class BFS {
     private boolean flagCaptured = false;
     private boolean gameOver = false;
     private int steps = 0;
-    private int prevRow = 0, prevCol = 0; // track agent position
+    private boolean slowMode;
 
-    public BFS(Grid grid) {
+    public BFS(Grid grid, boolean slowMode) {
         this.grid = grid;
         this.visited = new boolean[grid.getSize()][grid.getSize()];
+        this.slowMode = slowMode;
     }
 
     public void start() {
-        System.out.println("\n--- Starting Breadth-First Search ---");
+        System.out.println("\n--- The England’s Game Begins (Breadth-First Search) ---");
         long startTime = System.currentTimeMillis();
 
+        int startRow = 0, startCol = 0;
         Queue<int[]> queue = new LinkedList<>();
-        queue.add(new int[]{0, 0});
-        visited[0][0] = true;
+        visited[startRow][startCol] = true;
+        queue.add(new int[]{startRow, startCol});
 
         while (!queue.isEmpty() && !gameOver) {
-            int[] pos = queue.poll();
-            int row = pos[0];
-            int col = pos[1];
+            int[] current = queue.poll();
+            int row = current[0];
+            int col = current[1];
 
-            // Read original cell BEFORE we overwrite it with AGENT
-            int origCell = grid.getCell(row, col);
+            int cell = grid.getCell(row, col);
 
-            // If this is an EXIT and flag not yet captured, do not step onto it — skip moving agent here.
-            if (origCell == Grid.EXIT && !flagCaptured) {
-                // we don't visually move the agent into a locked exit
-                // but still allow BFS to explore from this node (it stays in the frontier)
-            } else {
-                // Move agent visually: clear previous and set new position
-                grid.setCell(prevRow, prevCol, Grid.EMPTY);
-                grid.setCell(row, col, Grid.AGENT);
-                prevRow = row; prevCol = col;
-
-                steps++;
-                int nearbyMines = grid.countNearbyMines(row, col);
-                System.out.println("\nStep " + steps + ": Agent moved to (" + row + "," + col + ") | Nearby Mines: " + nearbyMines);
-                grid.printGrid();
-
-                // Now check the original cell for events (mine/flag/exit)
-                if (origCell == Grid.MINE) {
-                    System.out.println("Agent stepped on a mine at (" + row + "," + col + "). Game Over!");
-                    gameOver = true;
-                    break;
-                }
-
-                if (origCell == Grid.FLAG) {
-                    flagCaptured = true;
-                    System.out.println("Flag captured at (" + row + "," + col + ")!");
-                }
-
-                if (origCell == Grid.EXIT && flagCaptured) {
-                    System.out.println("Agent reached the exit successfully!");
-                    gameOver = true;
-                    break;
-                }
+            // Skip unpassable tiles
+            if (cell == Grid.MINE || cell == Grid.WALL) {
+                continue;
             }
 
-            // Enqueue neighbors using passability rule that respects exit-locking
-            int[][] moves = {{1,0}, {-1,0}, {0,1}, {0,-1}};
+            // Move agent visually (step-by-step)
+            simulateMovement(row, col);
+
+            int nearbyMines = grid.countNearbyMines(row, col);
+            System.out.println("Step " + (++steps) + ": Agent at (" + row + "," + col + ") | Nearby Mines: " + nearbyMines);
+            if (nearbyMines > 0) System.out.println("Nearby mines detected. Stay cautious...");
+
+            // Check special tiles
+            if (cell == Grid.FLAG && !flagCaptured) {
+                flagCaptured = true;
+                System.out.println("Flag captured at (" + row + "," + col + ")!");
+                // Reset BFS from this new starting point
+                visited = new boolean[grid.getSize()][grid.getSize()];
+                queue.clear();
+                queue.add(new int[]{row, col});
+                visited[row][col] = true;
+                continue;
+            }
+
+            if (cell == Grid.EXIT && flagCaptured) {
+                System.out.println("Agent reached the exit safely!");
+                gameOver = true;
+                break;
+            }
+
+            // Explore BFS neighbors (down, up, right, left)
+            int[][] moves = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
             for (int[] mv : moves) {
                 int newRow = row + mv[0];
                 int newCol = col + mv[1];
                 if (grid.inBounds(newRow, newCol) && !visited[newRow][newCol]) {
-                    // only enqueue if passable given flagCaptured
-                    if (grid.isPassable(newRow, newCol, flagCaptured)) {
-                        visited[newRow][newCol] = true;
-                        queue.add(new int[]{newRow, newCol});
-                    }
+                    int nextCell = grid.getCell(newRow, newCol);
+
+                    // Avoid impassable tiles
+                    if (nextCell == Grid.MINE || nextCell == Grid.WALL) continue;
+
+                    // Exit locked before flag
+                    if (nextCell == Grid.EXIT && !flagCaptured) continue;
+
+                    visited[newRow][newCol] = true;
+                    queue.add(new int[]{newRow, newCol});
                 }
             }
-
-            // small delay for readability (optional)
-            try { Thread.sleep(300); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
         }
 
         long endTime = System.currentTimeMillis();
-        if (!gameOver) System.out.println("No path found or exit unreachable.");
+
+        if (!gameOver)
+            System.out.println("\nNo viable path left... The trench has claimed another soul.");
 
         System.out.println("\nTotal steps: " + steps);
         System.out.println("Elapsed time: " + (endTime - startTime) + "ms");
     }
+
+    // Moves agent one tile at a time toward target coordinates safely
+    private void simulateMovement(int destRow, int destCol) {
+        int currentRow = -1, currentCol = -1;
+
+        // Find agent’s current position
+        for (int r = 0; r < grid.getSize(); r++) {
+            for (int c = 0; c < grid.getSize(); c++) {
+                if (grid.getCell(r, c) == Grid.AGENT) {
+                    currentRow = r;
+                    currentCol = c;
+                }
+            }
+        }
+
+        if (currentRow == -1) currentRow = 0;
+        if (currentCol == -1) currentCol = 0;
+
+        // Step-by-step walking
+        while (currentRow != destRow || currentCol != destCol) {
+            int dRow = Integer.compare(destRow, currentRow);
+            int dCol = Integer.compare(destCol, currentCol);
+
+            int nextRow = currentRow + dRow;
+            int nextCol = currentCol + dCol;
+
+            // Check if next step is safe
+            if (!grid.inBounds(nextRow, nextCol)) break;
+
+            int nextCell = grid.getCell(nextRow, nextCol);
+
+            // Avoid mines and walls during actual movement
+            if (nextCell == Grid.MINE || nextCell == Grid.WALL) {
+                System.out.println("Blocked at (" + nextRow + "," + nextCol + "). Changing path...");
+                return;
+            }
+
+            // Exit early if locked
+            if (nextCell == Grid.EXIT && !flagCaptured) {
+                System.out.println("Exit locked. Must find the flag first!");
+                return;
+            }
+
+            // Move
+            grid.setCell(currentRow, currentCol, Grid.EMPTY);
+            grid.setCell(nextRow, nextCol, Grid.AGENT);
+            currentRow = nextRow;
+            currentCol = nextCol;
+
+            grid.printGrid();
+            grid.waitForNextStep(slowMode);
+        }
+    }
 }
+ 
