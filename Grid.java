@@ -126,6 +126,7 @@ public class Grid {
                     case FLAG -> System.out.print(GREEN + "3 " + RESET);
                     case EXIT -> System.out.print(YELLOW + "4 " + RESET);
                     case AGENT -> System.out.print(BLUE + "9 " + RESET);
+                    case 8 -> System.out.print("\u001B[38;5;208m9 " + RESET);
                     default -> System.out.print("0 ");
                 }
             }
