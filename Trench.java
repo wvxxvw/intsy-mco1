@@ -32,7 +32,10 @@ public class Trench {
                     BFS bfs = new BFS(grid, slowMode); // add the slowMode parameter for the choosing for your algorithm
                     bfs.start();
                 }
-                case 2 -> System.out.println("DFS not yet implemented.");
+                case 2 -> {
+                    DFS dfs = new DFS(grid, slowMode);
+                    dfs.start();
+                }
                 case 3 -> System.out.println("IDS not yet implemented.");
                 default -> System.out.println("Invalid choice.");
             }
