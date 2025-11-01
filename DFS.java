@@ -41,13 +41,13 @@ public class DFS {
 
         // Sense danger around this cell
         int nearbyMines = grid.countNearbyMines(row, col);
-        
+
         simulateMovement(row, col, nearbyMines);
 
         System.out.println("Step " + (++steps) + ": Agent at (" + row + "," + col + ") | Nearby Mines: " + nearbyMines);
         if (nearbyMines > 0)
             System.out.println("Warning: Mines nearby! Avoiding dangerous direction...");
-        
+
         if (cell == Grid.FLAG && !flagCaptured) {
             flagCaptured = true;
             System.out.println("Flag captured at (" + row + "," + col + ")!");
@@ -58,7 +58,7 @@ public class DFS {
             gameOver = true;
             return;
         }
-        
+
         int[][] moves = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
         List<int[]> safeMoves = new ArrayList<>();
 
@@ -82,7 +82,7 @@ public class DFS {
             dfs(move[0], move[1]);
             if (gameOver) return;
         }
-        
+
         grid.setCell(row, col, Grid.EMPTY);
         grid.printGrid();
         grid.waitForNextStep(slowMode);
@@ -97,16 +97,16 @@ public class DFS {
                 }
             }
         }
-        
+
         if (dangerLevel > 0) {
-            grid.setCell(destRow, destCol, 8); 
+            grid.setCell(destRow, destCol, 8);
         } else {
             grid.setCell(destRow, destCol, Grid.AGENT);
         }
 
         grid.printGrid();
         grid.waitForNextStep(slowMode);
-        
+
         grid.setCell(destRow, destCol, Grid.AGENT);
     }
 }
