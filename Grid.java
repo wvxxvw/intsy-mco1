@@ -4,7 +4,9 @@ public class Grid {
     private final int SIZE = 10;
     private final int[][] grid = new int[SIZE][SIZE];
     private int[][] backup; //for Restart feature
-
+    
+    
+    public static final int VISITED = -1;
     public static final int EMPTY = 0;
     public static final int MINE = 1;
     public static final int WALL = 2;
@@ -68,8 +70,11 @@ public class Grid {
     // Getters and core logic
     public int getSize() { return SIZE; }
     public int getCell(int row, int col) { return grid[row][col]; }
-    public int getCell(Vector2 cell) { return grid[cell.getVector2_x()][cell.getVector2_y()]}
+    public int getCell(Vector2 cell) { return grid[cell.getVector2_x()][cell.getVector2_y()];}
     public void setCell(int row, int col, int val) { grid[row][col] = val; }
+    public void setCell(Vector2 cell, int val) { 
+        grid[cell.getVector2_x()][cell.getVector2_y()] = val; 
+    }
     public void clearCell(int row, int col) { grid[row][col] = EMPTY; }
 
     public boolean inBounds(int row, int col) {
