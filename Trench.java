@@ -36,7 +36,11 @@ public class Trench {
                     DFS dfs = new DFS(grid, slowMode);
                     dfs.start();
                 }
-                case 3 -> System.out.println("IDS not yet implemented.");
+                case 3 -> {
+                    IDS ids = new IDS(grid);
+                    ids.start(0,0);
+                    System.out.println("IDS");
+                }
                 default -> System.out.println("Invalid choice.");
             }
 
@@ -69,3 +73,4 @@ public class Trench {
         scan.close();
     }
 }
+
