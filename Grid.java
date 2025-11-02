@@ -3,7 +3,7 @@ import java.util.Random;
 public class Grid {
     private final int SIZE = 10;
     private final int[][] grid = new int[SIZE][SIZE];
-    private int[][] backup;
+    private int[][] backup; //for Restart feature
 
     public static final int EMPTY = 0;
     public static final int MINE = 1;
@@ -16,31 +16,12 @@ public class Grid {
 
     public Grid() {
         generateGrid();
-        backupGrid();
-    }
-
-    public void waitForNextStep(boolean slowMode) {
-        if (slowMode) {
-            System.out.print("Press C to continue... ");
-            try {
-                while (true) {
-                    int key = System.in.read();
-                    if (key == 'C' || key == 'c') break;
-                }
-            } catch (Exception e) {
-                System.out.println("Error waiting for input.");
-            }
-        } else {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
+        backupGrid(); //  save initial state
     }
 
     public void generateGrid() {
         Random rand = new Random();
+
         for (int row = 0; row < SIZE; row++) {
             for (int col = 0; col < SIZE; col++) {
                 int randomize = rand.nextInt(100);
@@ -66,19 +47,28 @@ public class Grid {
         grid[ERow][ECol] = EXIT;
     }
 
+    // Save a deep copy of current grid (For Restart)
     private void backupGrid() {
         backup = new int[SIZE][SIZE];
         for (int r = 0; r < SIZE; r++)
             System.arraycopy(grid[r], 0, backup[r], 0, SIZE);
     }
 
+    // Restore from backup (For Restart)
     public void restoreGrid() {
         for (int r = 0; r < SIZE; r++)
             System.arraycopy(backup[r], 0, grid[r], 0, SIZE);
     }
 
+    // Re-save new layout when a full Reset is done
+    public void refreshBackup() {
+        backupGrid();
+    }
+
+    // Getters and core logic
     public int getSize() { return SIZE; }
     public int getCell(int row, int col) { return grid[row][col]; }
+    public int getCell(Vector2 cell) { return grid[cell.getVector2_x()][cell.getVector2_y()]}
     public void setCell(int row, int col, int val) { grid[row][col] = val; }
     public void clearCell(int row, int col) { grid[row][col] = EMPTY; }
 
@@ -106,6 +96,7 @@ public class Grid {
         return count;
     }
 
+    // Colored printing
     public void printGrid() {
         final String RESET = "\u001B[0m";
         final String RED = "\u001B[31m";
@@ -126,7 +117,6 @@ public class Grid {
                     case FLAG -> System.out.print(GREEN + "3 " + RESET);
                     case EXIT -> System.out.print(YELLOW + "4 " + RESET);
                     case AGENT -> System.out.print(BLUE + "9 " + RESET);
-                    case 8 -> System.out.print("\u001B[38;5;208m9 " + RESET);
                     default -> System.out.print("0 ");
                 }
             }
@@ -134,6 +124,7 @@ public class Grid {
         }
     }
 
+    // Getters for coordinates
     public int getFRow() { return FRow; }
     public int getFCol() { return FCol; }
     public int getERow() { return ERow; }
