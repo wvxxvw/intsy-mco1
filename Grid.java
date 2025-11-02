@@ -77,6 +77,14 @@ public class Grid {
     }
     public void clearCell(int row, int col) { grid[row][col] = EMPTY; }
 
+    public void clearAllCell(){
+        for(int i = 0; i < SIZE; i++){
+            for(int j = 0; j < SIZE; j++){
+                clearCell(i, j);
+            }
+        }
+    }
+
     public boolean inBounds(int row, int col) {
         return row >= 0 && col >= 0 && row < SIZE && col < SIZE;
     }
