@@ -39,7 +39,7 @@ public class Trench {
                 }
                 case 3 -> {
                     IDS ids = new IDS(grid, slowMode);
-                    ids.start(0,0);4
+                    ids.start(0,0);
                     System.out.println("IDS");
                 }
                 case 4 -> {
@@ -78,5 +78,6 @@ public class Trench {
         scan.close();
     }
 }
+
 
 
