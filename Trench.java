@@ -1,3 +1,21 @@
+/*
+    This project was made by the Chunglers:
+    Adornado, Louis Zendrix
+    Chung, Josh Matthew
+    Eugenio, Joaquin
+
+    BFS - Louis
+    DFS - Jmat
+    IDS - Joax
+    Greedy - Louis & Joax
+
+    -------------
+    Trench.java - Main file
+    Grid.java - Helper class for making the board grid and for the slowMode
+    
+    Uses Java.
+    MCO1 - CBINTSY - November 3 2025
+*/
 import java.util.*;
 
 public class Trench {
@@ -78,6 +96,7 @@ public class Trench {
         scan.close();
     }
 }
+
 
 
 
