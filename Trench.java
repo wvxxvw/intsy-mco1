@@ -41,6 +41,10 @@ public class Trench {
                     ids.start(0,0);
                     System.out.println("IDS");
                 }
+                case 4 -> {
+                    Greedy greed = new Greedy(grid, true);
+                    greed.start(0,0);
+                }
                 default -> System.out.println("Invalid choice.");
             }
 
@@ -73,4 +77,5 @@ public class Trench {
         scan.close();
     }
 }
+
 
