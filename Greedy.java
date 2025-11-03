@@ -50,6 +50,7 @@ public class Greedy {
 
         System.out.println("Got flag!");
         System.out.println("Going to exit!");
+        this.visited = new Grid();
         performGreedy(SecondPhase, exit);
 
         long endTime = System.currentTimeMillis();
@@ -118,8 +119,8 @@ public class Greedy {
         ArrayList<Vector2> currentQueue = new ArrayList<>();
 
         while(!currentCell.compare(target)){
-
-            grid.setCell(previousCell, Grid.EMPTY);
+            if(grid.getCell(previousCell) != Grid.FLAG && grid.getCell(previousCell) != Grid.EXIT)
+                grid.setCell(previousCell, Grid.EMPTY);
             if(grid.getCell(currentCell) != Grid.FLAG && grid.getCell(currentCell) != Grid.EXIT)
                 grid.setCell(currentCell, Grid.AGENT);
             visited.setCell(currentCell, Grid.VISITED);
