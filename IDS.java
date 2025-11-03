@@ -75,6 +75,7 @@ public class IDS{
 
         flag = ids(xRow, yCol, Grid.FLAG);
         System.out.println("Found flag! at " + flag.getVector());
+        this.visited = new Grid();
         exit = ids(flag.getVector2_x(), flag.getVector2_y(), Grid.EXIT);
         System.out.println("Found exit! at " + exit.getVector());
         if(gameOver){
@@ -116,6 +117,16 @@ public class IDS{
         }
         System.out.println("Top");
     }
+    private void clearAgents(Grid grid){
+        for(int i = 0; i < grid.getSize(); i++){
+            for(int j = 0; j < grid.getSize(); j++){
+                Vector2 currentVector = new Vector2(i, j);
+                if(grid.getCell(currentVector) == Grid.AGENT){
+                    grid.setCell(currentVector, Grid.EMPTY);
+                }
+            }
+        }
+    }
     private Vector2 ids(int xRow, int yCol, int target){
         ArrayList<Vector2> stack = new ArrayList<Vector2>();
         System.out.println("Starting IDS");
@@ -131,31 +142,34 @@ public class IDS{
 
             if(currentDepth == depthLimit){
                 System.out.println("Reset");
+                clearAgents(grid);
                 currentDepth = 0;
                 depthLimit++;
                 currentCell = new Vector2(xRow, yCol);
                 System.out.println("New: " + currentCell.getVector());
                 stack.clear();
                 visited.clearAllCell();
-                grid.setCell(previousCell, Grid.EMPTY);
                 previousCell = new Vector2(xRow, yCol);
 
             }
-            grid.setCell(previousCell, Grid.EMPTY);
-            grid.setCell(currentCell, Grid.AGENT);
+            if(grid.getCell(previousCell) != Grid.FLAG && grid.getCell(previousCell) != Grid.EXIT)
+                grid.setCell(previousCell, Grid.EMPTY);
+            if(grid.getCell(currentCell) != Grid.FLAG && grid.getCell(currentCell) != Grid.EXIT)
+                grid.setCell(currentCell, Grid.AGENT);
             visited.setCell(currentCell, Grid.VISITED);
 
             grid.printGrid();
             grid.waitForNextStep(slowMode);
             detect_neighbors(currentCell, target, stack);
+            previousCell = currentCell;
             if(stack.size()>0)
                 currentCell = pop(stack);
             currentDepth++;
 
-            grid.setCell(previousCell, Grid.EMPTY);
+            
             System.out.println("Current Cell: " + currentCell.getVector());
 
-            previousCell = currentCell;
+            
 
             simulation_count++;
         }
