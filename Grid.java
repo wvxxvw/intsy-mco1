@@ -3,9 +3,9 @@ import java.util.Random;
 public class Grid {
     private final int SIZE = 10;
     private final int[][] grid = new int[SIZE][SIZE];
-    private int[][] backup; //for Restart feature
-    
-    
+    private int[][] backup; // For Restart feature
+
+    // Cell types
     public static final int VISITED = -1;
     public static final int EMPTY = 0;
     public static final int MINE = 1;
@@ -14,13 +14,37 @@ public class Grid {
     public static final int EXIT = 4;
     public static final int AGENT = 9;
 
+    // Coordinates for important tiles
     private int FRow, FCol, ERow, ECol;
 
+    // --- Constructor ---
     public Grid() {
         generateGrid();
-        backupGrid(); //  save initial state
+        backupGrid(); // Save initial state
     }
 
+    // --- Step Delay and Manual Mode ---
+    public void waitForNextStep(boolean slowMode) {
+        if (slowMode) {
+            System.out.print("Press C to continue... ");
+            try {
+                while (true) {
+                    int key = System.in.read();
+                    if (key == 'C' || key == 'c') break;
+                }
+            } catch (Exception e) {
+                System.out.println("Error waiting for input.");
+            }
+        } else {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    // --- Grid Generation ---
     public void generateGrid() {
         Random rand = new Random();
 
@@ -33,13 +57,16 @@ public class Grid {
             }
         }
 
+        // Agent starts at top-left
         grid[0][0] = AGENT;
 
+        // Randomly place the Flag
         do {
             FRow = rand.nextInt(SIZE);
             FCol = rand.nextInt(SIZE);
         } while ((FRow == 0 && FCol == 0) || (FRow <= 1 && FCol <= 1) || grid[FRow][FCol] != EMPTY);
 
+        // Randomly place the Exit
         do {
             ERow = rand.nextInt(SIZE);
             ECol = rand.nextInt(SIZE);
@@ -49,42 +76,43 @@ public class Grid {
         grid[ERow][ECol] = EXIT;
     }
 
-    // Save a deep copy of current grid (For Restart)
+    // --- Backup & Restore Features ---
     private void backupGrid() {
         backup = new int[SIZE][SIZE];
         for (int r = 0; r < SIZE; r++)
             System.arraycopy(grid[r], 0, backup[r], 0, SIZE);
     }
 
-    // Restore from backup (For Restart)
     public void restoreGrid() {
         for (int r = 0; r < SIZE; r++)
             System.arraycopy(backup[r], 0, grid[r], 0, SIZE);
     }
 
-    // Re-save new layout when a full Reset is done
     public void refreshBackup() {
         backupGrid();
     }
 
-    // Getters and core logic
+    // --- Core Getters and Setters ---
     public int getSize() { return SIZE; }
     public int getCell(int row, int col) { return grid[row][col]; }
-    public int getCell(Vector2 cell) { return grid[cell.getVector2_x()][cell.getVector2_y()];}
+    public int getCell(Vector2 cell) { return grid[cell.getVector2_x()][cell.getVector2_y()]; }
+
     public void setCell(int row, int col, int val) { grid[row][col] = val; }
-    public void setCell(Vector2 cell, int val) { 
-        grid[cell.getVector2_x()][cell.getVector2_y()] = val; 
+    public void setCell(Vector2 cell, int val) {
+        grid[cell.getVector2_x()][cell.getVector2_y()] = val;
     }
+
     public void clearCell(int row, int col) { grid[row][col] = EMPTY; }
 
-    public void clearAllCell(){
-        for(int i = 0; i < SIZE; i++){
-            for(int j = 0; j < SIZE; j++){
+    public void clearAllCell() {
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
                 clearCell(i, j);
             }
         }
     }
 
+    // --- Tile Logic ---
     public boolean inBounds(int row, int col) {
         return row >= 0 && col >= 0 && row < SIZE && col < SIZE;
     }
@@ -97,6 +125,7 @@ public class Grid {
         return true;
     }
 
+    // --- Mine Detection ---
     public int countNearbyMines(int row, int col) {
         int count = 0;
         for (int dr = -1; dr <= 1; dr++) {
@@ -109,7 +138,7 @@ public class Grid {
         return count;
     }
 
-    // Colored printing
+    // --- Colored Console Display ---
     public void printGrid() {
         final String RESET = "\u001B[0m";
         final String RED = "\u001B[31m";
@@ -137,7 +166,7 @@ public class Grid {
         }
     }
 
-    // Getters for coordinates
+    // --- Getters for Key Coordinates ---
     public int getFRow() { return FRow; }
     public int getFCol() { return FCol; }
     public int getERow() { return ERow; }
