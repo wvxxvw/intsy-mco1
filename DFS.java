@@ -15,7 +15,7 @@ public class DFS {
     }
 
     public void start() {
-        System.out.println("\n--- The Fisherman's Journey Begins (DFS Stack Version) ---");
+        System.out.println("\n--- The Fisherman's Journey Begins (DFS) ---");
         long startTime = System.currentTimeMillis();
 
         Stack<int[]> stack = new Stack<>();
@@ -144,3 +144,4 @@ public class DFS {
         }
     }
 }
+
