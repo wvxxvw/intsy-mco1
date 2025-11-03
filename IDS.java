@@ -37,9 +37,9 @@ class Vector2{
     }
     public boolean check_if_vec_inside_bounds(Vector2 l_bound, Vector2 u_bound){
         if(this.x <= u_bound.x && this.y <= u_bound.y &&
-            this.x >= l_bound.x && this.y >= l_bound.y){
-                return true;
-            }
+                this.x >= l_bound.x && this.y >= l_bound.y){
+            return true;
+        }
         else
             return false;
     }
@@ -51,19 +51,21 @@ public class IDS{
     private boolean flagCaptured = false;
     private boolean gameOver = false;
     private int steps = 0;
+    private boolean slowMode;
 
     //private int currentDepth = 0;
     //private int depthLimit = 0;
 
-    
+
 
     private int prevRow, prevCol;
 
-    public IDS(Grid grid){
+    public IDS(Grid grid, boolean slowMode) {
         this.grid = grid;
         this.visited = new Grid();
-
+        this.slowMode = slowMode;
     }
+
     public void start(int xRow, int yCol){
         Vector2 flag;
         Vector2 exit;
@@ -126,7 +128,7 @@ public class IDS{
         int currentDepth = 0;
         int depthLimit = 0;
         while(grid.getCell(currentCell) != target){
-            
+
             if(currentDepth == depthLimit){
                 System.out.println("Reset");
                 currentDepth = 0;
@@ -144,11 +146,7 @@ public class IDS{
             visited.setCell(currentCell, Grid.VISITED);
 
             grid.printGrid();
-            try {
-                Thread.sleep(1); // 1000 milliseconds = 1 second
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            grid.waitForNextStep(slowMode);
             detect_neighbors(currentCell, target, stack);
             if(stack.size()>0)
                 currentCell = pop(stack);
@@ -158,7 +156,7 @@ public class IDS{
             System.out.println("Current Cell: " + currentCell.getVector());
 
             previousCell = currentCell;
-            
+
             simulation_count++;
         }
         return currentCell;
