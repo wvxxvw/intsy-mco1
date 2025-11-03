@@ -15,6 +15,7 @@ public class Trench {
             System.out.println(" [1] The England's Game (BFS)");
             System.out.println(" [2] The Fisherman (DFS)");
             System.out.println(" [3] The Royal Flush (IDS)");
+            System.out.println(" [4] The Raider’s Instinct (Greedy-BFS)");
             System.out.print("Your choice: ");
             int choice = scan.nextInt();
 
@@ -37,12 +38,12 @@ public class Trench {
                     dfs.start();
                 }
                 case 3 -> {
-                    IDS ids = new IDS(grid);
-                    ids.start(0,0);
+                    IDS ids = new IDS(grid, slowMode);
+                    ids.start(0,0);4
                     System.out.println("IDS");
                 }
                 case 4 -> {
-                    Greedy greed = new Greedy(grid, true);
+                    Greedy greed = new Greedy(grid, slowMode);
                     greed.start(0,0);
                 }
                 default -> System.out.println("Invalid choice.");

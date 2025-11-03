@@ -29,7 +29,7 @@ public class Greedy {
         return Math.abs(current.getVector2_x() - target.getVector2_x()) + Math.abs(current.getVector2_y() - target.getVector2_y());
     }
     public Vector2 findCoords(Grid grid, int target){
-        
+
         for(int i = 0; i < grid.getSize(); i++){
             for(int j = 0; j < grid.getSize(); j++){
                 if(grid.getCell(i, j) == target)
@@ -62,10 +62,10 @@ public class Greedy {
     }
 
     private void dequeue(ArrayList<Vector2> queue, Vector2 cell){
-        
+
     }
     private void detectNeighbors(ArrayList<Vector2> queue, Vector2 cell, Vector2 target){
-        
+
         for(Vector2 dir : sequence){
             Vector2 neighbor = cell.add(dir);
             if(!neighbor.check_if_vec_inside_bounds( new Vector2(0,0), new Vector2(grid.getSize()-1, grid.getSize()-1)))
@@ -124,6 +124,12 @@ public class Greedy {
                 grid.setCell(currentCell, Grid.AGENT);
             visited.setCell(currentCell, Grid.VISITED);
             grid.printGrid();
+            steps++;
+
+            int nearbyMines = grid.countNearbyMines(currentCell.getVector2_x(), currentCell.getVector2_y());
+            System.out.println("Step " + steps + ": " + currentCell.getVector() + " | Nearby Mines: " + nearbyMines);
+            grid.waitForNextStep(slowMode);
+
             detectNeighbors(currentQueue, currentCell, target);
             previousCell = currentCell;
             currentCell = priorityQueue(currentQueue, target);
@@ -136,12 +142,6 @@ public class Greedy {
                     return currentCell;
                 }
             }
-            try {
-                Thread.sleep(1000); // 1000 milliseconds = 1 second
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            
         }
         return null;
     }
